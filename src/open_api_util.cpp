@@ -294,33 +294,6 @@ string flat_vec(vector<boost::any> arr, string sep) {
   return boost::join(str_arr, sep);
 }
 
-string Alibabacloud_OpenApiUtil::Client::arrayToStringWithSpecifiedStyle(
-    const boost::any &array, shared_ptr<string> prefix,
-    shared_ptr<string> style) {
-  string result;
-  string sty = !style ? "" : *style;
-  if (typeid(shared_ptr<vector<boost::any>>) == array.type()) {
-    shared_ptr<vector<boost::any>> vec_ptr =
-        boost::any_cast<shared_ptr<vector<boost::any>>>(array);
-    if (!style || !vec_ptr) {
-      return result;
-    }
-
-    if (sty == "repeatList") {
-      result = flat_repeat_vec(*vec_ptr, *prefix);
-    } else if (sty == "simple") {
-      result = flat_vec(*vec_ptr, ",");
-    } else if (sty == "spaceDelimited") {
-      result = flat_vec(*vec_ptr, " ");;
-    } else if (sty == "pipeDelimited") {
-      result = flat_vec(*vec_ptr, "|");;
-    } else if (sty == "json") {
-      result = Darabonba_Util::Client::toJSONString(_parseToMap(array));
-    }
-    return result;
-  }
-  return "";
-}
 
 std::vector<std::string> explode(const std::string &str,
                                  const std::string &delimiter) {
@@ -514,6 +487,34 @@ vector<string> getCanonicalizedHeaders(map<string, string> headers) {
     canonical_headers.append(i.first).append(":").append(header_entry).append("\n");
   }
   return vector<string>({canonical_headers, boost::join(header_keys, ",")});
+}
+
+string Alibabacloud_OpenApiUtil::Client::arrayToStringWithSpecifiedStyle(
+        const boost::any &array, shared_ptr<string> prefix,
+        shared_ptr<string> style) {
+    string result;
+    string sty = !style ? "" : *style;
+    if (typeid(shared_ptr<vector<boost::any>>) == array.type()) {
+        shared_ptr<vector<boost::any>> vec_ptr =
+                boost::any_cast<shared_ptr<vector<boost::any>>>(array);
+        if (!style || !vec_ptr) {
+            return result;
+        }
+
+        if (sty == "repeatList") {
+            result = flat_repeat_vec(*vec_ptr, *prefix);
+        } else if (sty == "simple") {
+            result = flat_vec(*vec_ptr, ",");
+        } else if (sty == "spaceDelimited") {
+            result = flat_vec(*vec_ptr, " ");;
+        } else if (sty == "pipeDelimited") {
+            result = flat_vec(*vec_ptr, "|");;
+        } else if (sty == "json") {
+            result = Darabonba_Util::Client::toJSONString(_parseToMap(array));
+        }
+        return result;
+    }
+    return "";
 }
 
 string Client::getAuthorization(shared_ptr<Darabonba::Request> request,
